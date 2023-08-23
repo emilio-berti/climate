@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#SBATCH -J PresentBioclim
+#SBATCH --output=/home/%u/work/climate/present-bioclim.out
+#SBATCH --mem-per-cpu=40G
+#SBATCH --time=3-00:00:00
+#SBATCH --partition=kbs
+
+downloaddir="$1"
+outdir="/home/eberti_sta/scratch/climate/present/bioclim"
+
+module load R
+
+bash \
+  /home/eberti_sta/climate/scripts/bioclim-present.R \
+  "$downloaddir" "$outdir" &&
+  touch "/home/eberti_sta/climate/logs/.present-bioclimed"

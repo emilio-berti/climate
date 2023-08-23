@@ -25,3 +25,19 @@ else
   download=alreadydone
 fi
 
+if [[ $clear == yes ]] || [[ ! -e "logs/.present-bioclimed" ]]
+then
+  echo " - Bioclim present climate "
+  if [[ $download == alreadydone ]]
+  then
+    dep_bioclim=""
+  else
+    dep_bioclim="--dependency=afterok:$download"
+  fi
+  download_dir=/home/eberti_sta/scratch/climate/present/raw
+  bioclim=$(sbatch --parsable $dep_bioclim slurm/bioclim-present.sh "$download_dir")
+else
+  echo " - Present already bioclimed"
+  bioclim=alreadydone
+fi
+

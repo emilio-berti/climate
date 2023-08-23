@@ -2,9 +2,9 @@ echo " - Download CHELSA monthly timeseries"
 
 URLS="$1"
 OUTDIR="$2"
-if [ -d $DIR ]
+if [ -d $OUTDIR ]
 then
-  cd $DIR
+  cd $OUTDIR
 else
   exit 1
 fi
@@ -21,7 +21,8 @@ do
   then
     echo "     Downloading $z"
     wget -q $x || exit 1
-    fi
+  else echo " $z already downloaded"
+  fi
 done
 
 echo " - Download finished"
