@@ -3,7 +3,7 @@
 for arg in "$@"
 do
   case "$arg" in
-    --clean=)
+    --clean)
       clean=yes
       shift
       ;;
@@ -14,7 +14,10 @@ do
 done
 
 echo " ========= Download and process climate from CHELSA V2 ========= "
-echo " - Clean run "
+if [[ $clean == yes ]]
+then
+  echo " - Clean run "
+fi
 
 if [[ $clean == yes ]] || [[ ! -e "logs/.present-downloaded" ]]
 then
@@ -34,7 +37,8 @@ then
   else
     dep_bioclim="--dependency=afterok:$download"
   fi
-  download_dir=/home/eberti_sta/scratch/climate/present/raw
+  #download_dir=/home/eberti_sta/scratch/climate/present/raw
+  download_dir=/data/idiv_brose/emilio/climate/present/raw
   bioclim=$(sbatch --parsable $dep_bioclim slurm/bioclim-present.sh "$download_dir")
 else
   echo " - Present already bioclimed"
