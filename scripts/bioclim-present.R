@@ -135,7 +135,8 @@ BIO19 <- function(tas, pr, out_dir) {
 }
 
 # tas --------------
-load_tas <- function(ff) {
+load_tas <- function(ff, year) {
+  message("    - Load tas")
   f <- ff[grepl("_tas_", ff) & grepl(year, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   tas <-  stack(file.path(download_dir, f[order(mn)]))
@@ -145,7 +146,8 @@ load_tas <- function(ff) {
 }
 
 # tmin ---------------
-load_tmin <- function(ff) {
+load_tmin <- function(ff, year) {
+  message("    - Load tmin")
   f <- ff[grepl("_tasmin_", ff) & grepl(year, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   tmin <-  stack(file.path(download_dir, f[order(mn)]))
@@ -155,7 +157,8 @@ load_tmin <- function(ff) {
 }
 
 # tmax ---------------
-load_tmax <- function(ff) {
+load_tmax <- function(ff, year) {
+  message("    - Load tmax")
   f <- ff[grepl("_tasmax_", ff) & grepl(year, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   tmax <-  stack(file.path(download_dir, f[order(mn)]))
@@ -165,7 +168,8 @@ load_tmax <- function(ff) {
 }
 
 # pr ---------------
-load_pr <- function(ff) {
+load_pr <- function(ff, year) {
+  message("    - Load pr")
   f <- ff[grepl("pr_", ff) & grepl(year, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   pr <-  stack(file.path(download_dir, f[order(mn)]))
@@ -180,104 +184,104 @@ bioclim <- function(y, b) {
   message( " - BIO: ", b)
 
   if (b == "BIO01") {
-    tas <- load_tas(ff)
+    tas <- load_tas(ff, y)
     BIO01(tas, out_dir)
   }
 
   if (b == "BIO02") {
-    tmin <- load_tmin(ff)
-    tmax <- load_tmax(ff)
+    tmin <- load_tmin(ff, y)
+    tmax <- load_tmax(ff, y)
     BIO02(tmax, tmin, out_dir)
   }
 
   if (b == "BIO03") {
-    tmin <- load_tmin(ff)
-    tmax <- load_tmax(ff)
+    tmin <- load_tmin(ff, y)
+    tmax <- load_tmax(ff, y)
     BIO03(tmax, tmin, out_dir)
   }
 
   if (b == "BIO04") {
-    tas <- load_tas(ff)
+    tas <- load_tas(ff, y)
     BIO04(tas, out_dir)
   }
 
   if (b == "BIO05") {
-    tmax <- load_tmax(ff)
+    tmax <- load_tmax(ff, y)
     BIO05(tmax, out_dir)
   }
 
   if (b == "BIO06") {
-    tmin <- load_tmin(ff)
+    tmin <- load_tmin(ff, y)
     BIO06(tmin, out_dir)
   }
 
   if (b == "BIO07") {
-    tmin <- load_tmin(ff)
-    tmax <- load_tmax(ff)
+    tmin <- load_tmin(ff, y)
+    tmax <- load_tmax(ff, y)
     BIO07(tmax, tmin, out_dir)
   }  
 
   if (b == "BIO08") {
-    tas <- load_tas(ff)
-    pr <- load_pr(ff)
+    tas <- load_tas(ff, y)
+    pr <- load_pr(ff, y)
     BIO08(tas, pr, out_dir)
   }
 
   if (b == "BIO09") {
-    tas <- load_tas(ff)
-    pr <- load_pr(ff)
+    tas <- load_tas(ff, y)
+    pr <- load_pr(ff, y)
     BIO09(tas, pr, out_dir)
   }
 
   if (b == "BIO10") {
-    tas <- load_tas(ff)
+    tas <- load_tas(ff, y)
     BIO10(tas, out_dir)
   }
 
   if (b == "BIO11") {
-    tas <- load_tas(ff)
+    tas <- load_tas(ff, y)
     BIO11(tas, out_dir)
   }
 
   if (b == "BIO12") {
-    pr <- load_pr(ff)
+    pr <- load_pr(ff, y)
     BIO12(pr, out_dir)
   }
 
   if (b == "BIO13") {
-    pr <- load_pr(ff)
+    pr <- load_pr(ff, y)
     BIO13(pr, out_dir)
   }
 
   if (b == "BIO14") {
-    pr <- load_pr(ff)
+    pr <- load_pr(ff, y)
     BIO14(pr, out_dir)
   }
 
   if (b == "BIO15") {
-    pr <- load_pr(ff)
+    pr <- load_pr(ff, y)
     BIO15(pr, out_dir)
   }
 
   if (b == "BIO16") {
-    pr <- load_pr(ff)
+    pr <- load_pr(ff, y)
     BIO16(pr, out_dir)
   }
 
   if (b == "BIO17") {
-    pr <- load_pr(ff)
+    pr <- load_pr(ff, y)
     BIO17(pr, out_dir)
   }
 
   if (b == "BIO18") {
-    tas <- load_tas(ff)
-    pr <- load_pr(ff)
+    tas <- load_tas(ff, y)
+    pr <- load_pr(ff, y)
     BIO18(tas, pr, out_dir)
   }
 
   if (b == "BIO19") {
-    tas <- load_tas(ff)
-    pr <- load_pr(ff)
+    tas <- load_tas(ff, y)
+    pr <- load_pr(ff, y)
     BIO19(tas, pr, out_dir)
   }
 
