@@ -17,8 +17,8 @@ task <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 year <- pars[task, "year"]
 bio <- pars[task, "bio"]
 
-ff <- list.files(args[1])
-ff <- ff[!grepl(year, ff)] #missing some months
+ff <- list.files(download_dir)
+ff <- ff[grepl(year, ff)] #missing some months
 
 BIO01 <- function(tas, out_dir) {
   message("   - bio01")
@@ -136,39 +136,41 @@ BIO19 <- function(tas, pr, out_dir) {
 
 # tas --------------
 load_tas <- function(ff) {
-  f <- ff[grepl("_tas_", ff) & grepl(y, ff)]
+  f <- ff[grepl("_tas_", ff) & grepl(year, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   tas <-  stack(file.path(download_dir, f[order(mn)]))
-  names(tas) <- as.character(1:12)
   tas <- stack(tas / 100)
+  names(tas) <- as.character(1:12)
   return (tas)
 }
 
 # tmin ---------------
 load_tmin <- function(ff) {
-  f <- ff[grepl("_tasmin_", ff) & grepl(y, ff)]
+  f <- ff[grepl("_tasmin_", ff) & grepl(year, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   tmin <-  stack(file.path(download_dir, f[order(mn)]))
+  tmin <- stack(tmin / 100)
   names(tmin) <- as.character(1:12)
-  tmin <- stack(min / 100)
+  return (tmin)
 }
 
 # tmax ---------------
 load_tmax <- function(ff) {
-  f <- ff[grepl("_tasmax_", ff) & grepl(y, ff)]
+  f <- ff[grepl("_tasmax_", ff) & grepl(year, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   tmax <-  stack(file.path(download_dir, f[order(mn)]))
+  tmax <- stack(tmax / 100)
   names(tmax) <- as.character(1:12)
-  tmax <- stack(min / 100)
+  return (tmax)
 }
 
 # pr ---------------
 load_pr <- function(ff) {
-  f <- ff[grepl("pr_", ff) & grepl(y, ff)]
+  f <- ff[grepl("pr_", ff) & grepl(year, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   pr <-  stack(file.path(download_dir, f[order(mn)]))
   names(pr) <- as.character(1:12)
-  pr <- stack(min / 100)
+  return (pr)
 }
 
 message (" === START ===")
