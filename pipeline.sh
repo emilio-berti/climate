@@ -39,7 +39,8 @@ then
   fi
   #download_dir=/home/eberti_sta/scratch/climate/present/raw
   download_dir=/data/idiv_brose/emilio/climate/present/raw
-  bioclim=$(sbatch --parsable $dep_bioclim slurm/bioclim-present.sh "$download_dir")
+  biopars=/home/berti/climate/biopars.csv
+  bioclim=$(sbatch --parsable $dep_bioclim -a 1-$(xsv count $biopars) slurm/bioclim-present.sh "$download_dir" "$biopars")
 else
   echo " - Present already bioclimed"
   bioclim=alreadydone

@@ -10,12 +10,15 @@ args <- commandArgs(trailingOnly = TRUE)
 "%out%" <- Negate("%in%")
 download_dir <- args[1]
 out_dir <- args[2]
+pars <- args[3]
+
+pars <- read.csv(pars)
+task <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
+year <- pars[task, "year"]
+bio <- pars[task, "bio"]
 
 ff <- list.files(args[1])
-ff <- ff[!grepl("2019|1979", ff)] #missing some months
-
-vars <- c("tas", "tasmin", "tasmax", "pr")
-years <- seq(1980, 2018, by = 1)
+ff <- ff[!grepl(year, ff)] #missing some months
 
 BIO01 <- function(tas, out_dir) {
   message("   - bio01")
@@ -131,76 +134,153 @@ BIO19 <- function(tas, pr, out_dir) {
   writeRaster(b19, file.path(out_dir, paste0(y, "-BIO19.tif")), overwrite = TRUE)
 }
 
-message (" === START ===")
-
-bioclim <- function(y) {
-  message( " - Year: ", y)
-  # tas 
+# tas --------------
+load_tas <- function(ff) {
   f <- ff[grepl("_tas_", ff) & grepl(y, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   tas <-  stack(file.path(download_dir, f[order(mn)]))
   names(tas) <- as.character(1:12)
   tas <- stack(tas / 100)
- 
-  # tmin
-  #f <- ff[grepl("_tasmin_", ff) & grepl(y, ff)]
-  #mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
-  #tmin <-  stack(file.path(download_dir, f[order(mn)]))
-  #names(tmin) <- as.character(1:12)
-  #tmin <- stack(min / 100)
+  return (tas)
+}
 
-  # tmax
-  #f <- ff[grepl("_tasmax_", ff) & grepl(y, ff)]
-  #mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
-  #tmax <-  stack(file.path(download_dir, f[order(mn)]))
-  #names(tmax) <- as.character(1:12)
-  #tmax <- stack(tmax / 100)
+# tmin ---------------
+load_tmin <- function(ff) {
+  f <- ff[grepl("_tasmin_", ff) & grepl(y, ff)]
+  mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
+  tmin <-  stack(file.path(download_dir, f[order(mn)]))
+  names(tmin) <- as.character(1:12)
+  tmin <- stack(min / 100)
+}
 
-  # pr
+# tmax ---------------
+load_tmax <- function(ff) {
+  f <- ff[grepl("_tasmax_", ff) & grepl(y, ff)]
+  mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
+  tmax <-  stack(file.path(download_dir, f[order(mn)]))
+  names(tmax) <- as.character(1:12)
+  tmax <- stack(min / 100)
+}
+
+# pr ---------------
+load_pr <- function(ff) {
   f <- ff[grepl("pr_", ff) & grepl(y, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
   pr <-  stack(file.path(download_dir, f[order(mn)]))
   names(pr) <- as.character(1:12)
-
-  if ( paste0(y, "-BIO01.tif") %out% out_dir ) {
-    BIO01(tas, out_dir)
-  }
-  #BIO02(tmax, tmin, out_dir)
-  #BIO03(tmax, tmin, out_dir)
-  #BIO04(tas, out_dir)
-  #BIO05(tmax, out_dir)
-  #BIO06(tmin, out_dir)
-  #BIO07(tmax, tmin, out_dir)
-  #BIO08(tas, pr, out_dir)
-  #BIO09(tas, pr, out_dir)
-  if ( paste0(y, "-BIO10.tif") %out% out_dir ) {
-    BIO10(tas, out_dir)
-  }
-  if ( paste0(y, "-BIO11.tif") %out% out_dir ) {
-    BIO11(tas, out_dir)
-  }
-  if ( paste0(y, "-BIO12.tif") %out% out_dir ) {
-    BIO12(pr, out_dir)
-  }
-  if ( paste0(y, "-BIO16.tif") %out% out_dir ) {
-    BIO16(pr, out_dir)
-  }
-  if ( paste0(y, "-BIO17.tif") %out% out_dir ) {
-    BIO17(pr, out_dir)
-  }
-  #BIO13(pr, out_dir)
-  #BIO14(pr, out_dir)
-  #BIO15(pr, out_dir)
-  #BIO18(tas, pr, out_dir)
-  #BIO19(tas, pr, out_dir)
-  rm(tas)
-  #rm(tmin)
-  #rm(tmax)
-  rm(pr)
-  gc(full = TRUE)
+  pr <- stack(min / 100)
 }
 
-for (y in years) bioclim(y)
+message (" === START ===")
+
+bioclim <- function(y, b) {
+  message( " - Year: ", y)
+  message( " - BIO: ", b)
+
+  if (b == "BIO01") {
+    tas <- load_tas(ff)
+    BIO01(tas, out_dir)
+  }
+
+  if (b == "BIO02") {
+    tmin <- load_tmin(ff)
+    tmax <- load_tmax(ff)
+    BIO02(tmax, tmin, out_dir)
+  }
+
+  if (b == "BIO03") {
+    tmin <- load_tmin(ff)
+    tmax <- load_tmax(ff)
+    BIO03(tmax, tmin, out_dir)
+  }
+
+  if (b == "BIO04") {
+    tas <- load_tas(ff)
+    BIO04(tas, out_dir)
+  }
+
+  if (b == "BIO05") {
+    tmax <- load_tmax(ff)
+    BIO05(tmax, out_dir)
+  }
+
+  if (b == "BIO06") {
+    tmin <- load_tmin(ff)
+    BIO06(tmin, out_dir)
+  }
+
+  if (b == "BIO07") {
+    tmin <- load_tmin(ff)
+    tmax <- load_tmax(ff)
+    BIO07(tmax, tmin, out_dir)
+  }  
+
+  if (b == "BIO08") {
+    tas <- load_tas(ff)
+    pr <- load_pr(ff)
+    BIO08(tas, pr, out_dir)
+  }
+
+  if (b == "BIO09") {
+    tas <- load_tas(ff)
+    pr <- load_pr(ff)
+    BIO09(tas, pr, out_dir)
+  }
+
+  if (b == "BIO10") {
+    tas <- load_tas(ff)
+    BIO10(tas, out_dir)
+  }
+
+  if (b == "BIO11") {
+    tas <- load_tas(ff)
+    BIO11(tas, out_dir)
+  }
+
+  if (b == "BIO12") {
+    pr <- load_pr(ff)
+    BIO12(pr, out_dir)
+  }
+
+  if (b == "BIO13") {
+    pr <- load_pr(ff)
+    BIO13(pr, out_dir)
+  }
+
+  if (b == "BIO14") {
+    pr <- load_pr(ff)
+    BIO14(pr, out_dir)
+  }
+
+  if (b == "BIO15") {
+    pr <- load_pr(ff)
+    BIO15(pr, out_dir)
+  }
+
+  if (b == "BIO16") {
+    pr <- load_pr(ff)
+    BIO16(pr, out_dir)
+  }
+
+  if (b == "BIO17") {
+    pr <- load_pr(ff)
+    BIO17(pr, out_dir)
+  }
+
+  if (b == "BIO18") {
+    tas <- load_tas(ff)
+    pr <- load_pr(ff)
+    BIO18(tas, pr, out_dir)
+  }
+
+  if (b == "BIO19") {
+    tas <- load_tas(ff)
+    pr <- load_pr(ff)
+    BIO19(tas, pr, out_dir)
+  }
+
+}
+
+bioclim(year, bio)
 
 message (" === END ===")
-
