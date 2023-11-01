@@ -45,3 +45,37 @@ else
   bioclim=alreadydone
 fi
 
+if [[ $clear == yes ]] || [[ ! -e "logs/.present-detrended.log" ]]
+then
+  echo " - Detrend present bioclim "
+  if [[ $bioclim == alreadydone ]]
+  then 
+    detr_stats=""
+  else
+    detr_stats="--dependency=afterok:$bioclim"
+  fi
+  detr=$(sbatch --parsable $detr_stats slurm/detrend-present.sh)
+else 
+  echo " - Present already detrended"
+  detr=alreadydone
+fi
+
+if [[ $clear == yes ]] || [[ ! -e "logs/.present-stats.log" ]]
+then
+  echo " - Bioclim present statistics "
+  if [[ $bioclim == alreadydone ]]
+  then 
+    dep_stats=""
+  else
+    dep_stats="--dependency=afterok:$bioclim"
+  fi
+  data_dir=/data/idiv_brose/emilio/climate/present/bioclim
+  stats=$(sbatch --parsable $dep_stats slurm/bioclim-present-stats.sh)
+else 
+  echo " - Present statistics already calcualted"
+  stats=alreadydone
+fi
+
+  
+
+

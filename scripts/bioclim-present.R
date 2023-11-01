@@ -1,9 +1,13 @@
 library(tidyverse)
-library(terra)
+library(raster)
 library(squirrygis)
-terraOptions(memmax = 20, todisk = TRUE, tempdir = "/work/berti")
+rasterOptions(
+  maxmemory = 200e9,
+  tmpdir = "/work/berti/climate",
+  progress = ""
+)
 args <- commandArgs(trailingOnly = TRUE)
-
+"%out%" <- Negate("%in%")
 download_dir <- args[1]
 out_dir <- args[2]
 
@@ -134,31 +138,33 @@ bioclim <- function(y) {
   # tas 
   f <- ff[grepl("_tas_", ff) & grepl(y, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
-  tas <-  rast(file.path(download_dir, f[order(mn)]))
+  tas <-  stack(file.path(download_dir, f[order(mn)]))
   names(tas) <- as.character(1:12)
-  tas <- tas / 100
-
+  tas <- stack(tas / 100)
+ 
   # tmin
-  f <- ff[grepl("_tasmin_", ff) & grepl(y, ff)]
-  mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
-  tmin <-  rast(file.path(download_dir, f[order(mn)]))
-  names(tmin) <- as.character(1:12)
-  tmin <- tmin / 100
+  #f <- ff[grepl("_tasmin_", ff) & grepl(y, ff)]
+  #mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
+  #tmin <-  stack(file.path(download_dir, f[order(mn)]))
+  #names(tmin) <- as.character(1:12)
+  #tmin <- stack(min / 100)
 
   # tmax
-  f <- ff[grepl("_tasmax_", ff) & grepl(y, ff)]
-  mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
-  tmax <-  rast(file.path(download_dir, f[order(mn)]))
-  names(tmax) <- as.character(1:12)
-  tmax <- tmax / 100
+  #f <- ff[grepl("_tasmax_", ff) & grepl(y, ff)]
+  #mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
+  #tmax <-  stack(file.path(download_dir, f[order(mn)]))
+  #names(tmax) <- as.character(1:12)
+  #tmax <- stack(tmax / 100)
 
   # pr
   f <- ff[grepl("pr_", ff) & grepl(y, ff)]
   mn <- as.numeric(str_split(f, "_", simplify = TRUE)[, 3])
-  pr <-  rast(file.path(download_dir, f[order(mn)]))
+  pr <-  stack(file.path(download_dir, f[order(mn)]))
   names(pr) <- as.character(1:12)
 
-  #BIO01(tas, out_dir)
+  if ( paste0(y, "-BIO01.tif") %out% out_dir ) {
+    BIO01(tas, out_dir)
+  }
   #BIO02(tmax, tmin, out_dir)
   #BIO03(tmax, tmin, out_dir)
   #BIO04(tas, out_dir)
@@ -167,18 +173,30 @@ bioclim <- function(y) {
   #BIO07(tmax, tmin, out_dir)
   #BIO08(tas, pr, out_dir)
   #BIO09(tas, pr, out_dir)
-  #BIO10(tas, out_dir)
-  BIO11(tas, out_dir)
-  #BIO12(pr, out_dir)
+  if ( paste0(y, "-BIO10.tif") %out% out_dir ) {
+    BIO10(tas, out_dir)
+  }
+  if ( paste0(y, "-BIO11.tif") %out% out_dir ) {
+    BIO11(tas, out_dir)
+  }
+  if ( paste0(y, "-BIO12.tif") %out% out_dir ) {
+    BIO12(pr, out_dir)
+  }
+  if ( paste0(y, "-BIO16.tif") %out% out_dir ) {
+    BIO16(pr, out_dir)
+  }
+  if ( paste0(y, "-BIO17.tif") %out% out_dir ) {
+    BIO17(pr, out_dir)
+  }
   #BIO13(pr, out_dir)
   #BIO14(pr, out_dir)
   #BIO15(pr, out_dir)
-  #BIO16(pr, out_dir)
-  #BIO17(pr, out_dir)
   #BIO18(tas, pr, out_dir)
   #BIO19(tas, pr, out_dir)
-
-  rm(tas, tmin, tmax, pr)
+  rm(tas)
+  #rm(tmin)
+  #rm(tmax)
+  rm(pr)
   gc(full = TRUE)
 }
 

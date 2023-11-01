@@ -13,11 +13,10 @@
 #  "$downloaddir" "$outdir" &&
 #  touch "/home/eberti_sta/climate/logs/.present-bioclimed"
 
-downloaddir="$1"
 outdir="/data/idiv_brose/emilio/climate/present/bioclim"
 module load GCC/12.2.0 OpenMPI/4.1.4 R/4.2.2 GDAL/3.6.2
 Rscript --vanilla \
   /home/berti/climate/scripts/bioclim-present.R \
-  "$downloaddir" "$outdir" &&
-  touch "/home/berti/climate/logs/.present-bioclimed"
+  "$outdir" &&
+  touch "/home/berti/climate/logs/.present-detrended"
 
