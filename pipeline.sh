@@ -55,7 +55,7 @@ then
   else
     detr_stats="--dependency=afterok:$bioclim"
   fi
-  detr=$(sbatch --parsable $detr_stats slurm/detrend-present.sh)
+  #detr=$(sbatch --parsable $detr_stats slurm/detrend-present.sh)
 else 
   echo " - Present already detrended"
   detr=alreadydone
@@ -71,7 +71,7 @@ then
     dep_stats="--dependency=afterok:$bioclim"
   fi
   data_dir=/data/idiv_brose/emilio/climate/present/bioclim
-  stats=$(sbatch --parsable $dep_stats slurm/bioclim-present-stats.sh)
+  #stats=$(sbatch --parsable $dep_stats slurm/bioclim-present-stats.sh)
 else 
   echo " - Present statistics already calcualted"
   stats=alreadydone

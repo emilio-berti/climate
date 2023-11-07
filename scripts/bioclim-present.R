@@ -2,7 +2,9 @@ library(tidyverse)
 library(raster)
 library(squirrygis)
 rasterOptions(
-  maxmemory = 200e9,
+  maxmemory = 100e9,
+  chunksize = 50e9,
+  todisk = FALSE,
   tmpdir = "/work/berti/climate",
   progress = ""
 )
@@ -68,7 +70,7 @@ BIO08 <- function(tas, pr, out_dir, year) {
   writeRaster(b8, file.path(out_dir, paste0(year, "-BIO08.tif")), overwrite = TRUE)
 }
 
-BIO09 <- function(tas, pr, out_dir) , year{  
+BIO09 <- function(tas, pr, out_dir, year) {  
   message("   - bio09")
   b9 <- bio09(tas, pr)
   writeRaster(b9, file.path(out_dir, paste0(year, "-BIO09.tif")), overwrite = TRUE)
@@ -92,13 +94,13 @@ BIO12 <- function(pr, out_dir, year) {
   writeRaster(b12, file.path(out_dir, paste0(year, "-BIO12.tif")), overwrite = TRUE)
 }
 
-BIO13 <- function(pr, out_di, yearr){
+BIO13 <- function(pr, out_dir, year){
   message("   - bio13")
   b13 <- bio13(pr)
   writeRaster(b13, file.path(out_dir, paste0(year, "-BIO13.tif")), overwrite = TRUE)
 }
 
-BIO14 <- function(pr, out_di, yearr){
+BIO14 <- function(pr, out_dir, year){
   message("   - bio14")
   b14 <- bio14(pr)
   writeRaster(b14, file.path(out_dir, paste0(year, "-BIO14.tif")), overwrite = TRUE)
@@ -182,7 +184,12 @@ message (" ====== START ======")
 bioclim <- function(y, b) {
   message( " - Year: ", y)
   message( " - BIO: ", b)
-
+  
+  if ( paste0(y, "-", b, ".tif") %in% list.files(out_dir) ) {
+    message(b, " for year ", y, " already calculated.")
+    return (NULL)
+  }
+  
   if (b == "BIO01") {
     tas <- load_tas(ff, y)
     BIO01(tas, out_dir, y)

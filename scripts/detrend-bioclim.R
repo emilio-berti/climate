@@ -1,14 +1,18 @@
 library(tidyverse)
 library(terra)
-library(squirrygis)
-terraOptions(memmax = 100, todisk = TRUE, tempdir = "/data/idiv_brose/emilio/tmp", progress = 0)
-args <- commandArgs(trailingOnly = TRUE)
 
-out_dir <- args[1]
+terraOptions(
+  memmax = 100,
+  tempdir = "/work/berti/climate"
+)
+
+args <- commandArgs(trailingOnly = TRUE)
+outdir <- args[1]
 
 # detrend function ----------
 detrend <- function(r) {
   years <- gsub("[A-Za-z]", "", names(r))
+  years <- gsub("-", "", years)
   d <- r %>% 
     values() %>% 
     as_tibble() %>% 
@@ -36,19 +40,20 @@ detrend <- function(r) {
   return (r)
 }
 
-
 # climate -------------
 message(" === START PROCEDURE === ")
 bios <- c("BIO01", "BIO10", "BIO11", "BIO12", "BIO16", "BIO17")
 for (bio in bios) {
   message("     - ", bio)
-  ff <- list.files(file.path(outdir, "climate"), pattern = bio)
-  years <- gsub(paste0(bio, "-|[.]tif"), "", ff)
-  r <- stack(file.path(outdir, "climate", ff[order(as.numeric(years))]))
+  ff <- list.files(outdir, pattern = bio)
+  years <- gsub(paste0("-", bio, "[.]tif"), "", ff)
+  message("       - load files")
+  r <- rast(file.path(outdir, ff[order(as.numeric(years))]))
   names(r) <- sort(as.numeric(years))
+  message("       - detrend")
   r <- detrend(r)
+  message("       - write to file")
   writeRaster(r, file.path(outdir, paste0(bio, "-detrended.tif")), overwrite = TRUE)
-  gc(full = TRUE)
 }
 message(" === END PROCEDURE ===")
 

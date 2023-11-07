@@ -2,8 +2,8 @@
 
 #SBATCH -J PresentBioclim
 #SBATCH --output=/work/%u/climate/present-bioclim-%a.out
-#SBATCH --mem-per-cpu=10G
-#SBATCH --time=0-02:00:00
+#SBATCH --mem-per-cpu=350G
+#SBATCH --time=0-06:00:00
 
 downloaddir="$1"
 pars="$2"
